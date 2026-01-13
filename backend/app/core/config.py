@@ -6,6 +6,7 @@ Loads environment variables and provides application settings.
 from pydantic_settings import BaseSettings
 from typing import List
 from functools import lru_cache
+import os
 
 
 class Settings(BaseSettings):
@@ -18,18 +19,20 @@ class Settings(BaseSettings):
     
     # Server Configuration
     host: str = "0.0.0.0"
-    port: int = 8000
-    debug: bool = True
-    env: str = "development"
+    port: int = int(os.getenv("PORT", 8000))
+    debug: bool = os.getenv("ENVIRONMENT", "development") != "production"
+    env: str = os.getenv("ENVIRONMENT", "development")
     
-    # CORS Configuration
+    # CORS Configuration - Allow all origins for Render deployment
     cors_origins: List[str] = [
         "http://localhost:3000",
         "http://localhost:3001",
         "http://127.0.0.1:3000",
         "http://127.0.0.1:3001",
         "http://localhost:5173",
-        "http://127.0.0.1:5173"
+        "http://127.0.0.1:5173",
+        "https://*.onrender.com",  # Render frontend
+        "*"  # Allow all for production (can be restricted later)
     ]
     
     # Model Paths
