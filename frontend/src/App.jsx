@@ -16,12 +16,15 @@ function App() {
   const [error, setError] = useState(null);
   const [backendStatus, setBackendStatus] = useState('checking'); // checking, awake, sleeping
 
-  // Wake up backend on component mount
+  // Wake up backend on component mount (non-blocking)
   useEffect(() => {
     const wakeBackend = async () => {
-      setBackendStatus('checking');
+      setBackendStatus('sleeping'); // Assume sleeping initially for Render free tier
       const isAwake = await wakeUpBackend();
-      setBackendStatus(isAwake ? 'awake' : 'sleeping');
+      if (isAwake) {
+        setBackendStatus('awake');
+      }
+      // Stay in 'sleeping' state if check fails - will update on first successful prediction
     };
     wakeBackend();
   }, []);
@@ -89,15 +92,22 @@ function App() {
             <div className="flex items-center gap-2 bg-success-50 border border-success-200 px-3 sm:px-4 py-2 rounded-lg">
               <div className={`w-2 h-2 rounded-full ${
                 backendStatus === 'awake' ? 'bg-success-500 animate-pulse' :
-                backendStatus === 'sleeping' ? 'bg-warning-500' :
+                backendStatus === 'sleeping' ? 'bg-warning-500 animate-pulse' :
                 'bg-gray-400 animate-pulse'
               }`}></div>
               <span className="text-xs sm:text-sm font-medium text-gray-700">
                 {backendStatus === 'awake' ? 'System Active' :
-                 backendStatus === 'sleeping' ? 'Waking up server...' :
+                 backendStatus === 'sleeping' ? 'Starting server...' :
                  'Checking status...'}
               </span>
             </div>
+            {backendStatus === 'sleeping' && (
+              <div className="w-full text-center">
+                <p className="text-xs text-warning-600 bg-warning-50 px-3 py-2 rounded">
+                  ⏱️ First load takes up to 2 minutes (free hosting tier). Please be patient!
+                </p>
+              </div>
+            )}
           </div>
         </div>
       </header>

@@ -11,7 +11,7 @@ const apiClient = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
-  timeout: 90000, // 90 seconds - Render free tier takes 50s to wake up
+  timeout: 120000, // 120 seconds (2 minutes) - Render free tier can take 50-90s to wake up
 });
 
 // Request interceptor
@@ -45,24 +45,32 @@ apiClient.interceptors.response.use(
 export const wakeUpBackend = async () => {
   try {
     const healthUrl = `${API_BASE_URL}/health`;
-    await axios.get(healthUrl, { timeout: 90000 });
+    await axios.get(healthUrl, { timeout: 120000 });
     return true;
   } catch (error) {
-    console.warn('Backend wake-up failed, but will retry with main request:', error.message);
+    console.warn('Backend wake-up check failed:', error.message);
     return false;
   }
 };
 
 /**
- * Predict fraud for a single transaction
+ * Predict fraud for a single transaction with retry logic
  */
-export const predictTransaction = async (transactionData) => {
+export const predictTransaction = async (transactionData, retryCount = 0) => {
   try {
     const response = await apiClient.post('/predictions/single', transactionData);
     return response.data;
   } catch (error) {
+    // Retry once if timeout on first attempt (backend might be waking)
+    if ((error.code === 'ECONNABORTED' || error.message.includes('timeout')) && retryCount === 0) {
+      console.log('First attempt timed out, retrying once...');
+      // Wait 3 seconds before retry
+      await new Promise(resolve => setTimeout(resolve, 3000));
+      return predictTransaction(transactionData, retryCount + 1);
+    }
+    
     if (error.code === 'ECONNABORTED' || error.message.includes('timeout')) {
-      throw new Error('Backend is waking up (takes ~50 seconds on Render free tier). Please try again in a moment.');
+      throw new Error('Server is still waking up. This can take up to 2 minutes on first use. Please wait a moment and try again.');
     }
     throw new Error(error.response?.data?.detail?.message || 'Failed to predict transaction');
   }
