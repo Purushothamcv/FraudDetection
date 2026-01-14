@@ -1,8 +1,8 @@
-# 🛡️ Financial Fraud Detection System
+Financial Fraud Detection System
 
 A production-grade, full-stack fraud detection system built with FastAPI (backend) and React (frontend).
 
-## 📋 System Overview
+System Overview
 
 This system uses a trained XGBoost model to detect fraudulent financial transactions in real-time with:
 - **99.97% ROC-AUC** performance
@@ -11,8 +11,7 @@ This system uses a trained XGBoost model to detect fraudulent financial transact
 - Risk-based decision engine
 
 ---
-
-## 🏗️ Architecture
+Architecture
 
 ```
 fraud-detection-system/
@@ -33,7 +32,7 @@ fraud-detection-system/
 
 ---
 
-## 🚀 Quick Start
+Quick Start
 
 ### Prerequisites
 - Python 3.9+
@@ -103,16 +102,7 @@ Returns model version, metrics, features, and training details.
 ### 3. Feature Importance
 **GET** `/api/v1/feature-importance`
 
-Returns top fraud indicators for explainability.
-
-### 4. Health Check
-**GET** `/health`
-
-Returns system health status.
-
----
-
-## 🎯 Risk Classification
+Risk Classification
 
 | Probability | Risk Level | Action | Description |
 |------------|-----------|--------|-------------|
@@ -122,7 +112,7 @@ Returns system health status.
 
 ---
 
-## 🔒 Security Features
+ Security Features
 
 - Input validation with Pydantic
 - Rate limiting (100 requests/minute)
@@ -133,7 +123,7 @@ Returns system health status.
 
 ---
 
-## 📊 Model Performance
+Model Performance
 
 | Metric | Score |
 |--------|-------|
@@ -145,7 +135,7 @@ Returns system health status.
 
 ---
 
-## 🛠️ Technology Stack
+Technology Stack
 
 **Backend:**
 - FastAPI 0.104.0
@@ -161,7 +151,7 @@ Returns system health status.
 
 ---
 
-## 📦 Project Structure
+Project Structure
 
 ```
 backend/
@@ -197,7 +187,7 @@ frontend/
 
 ---
 
-## 🧪 Testing
+ Testing
 
 ### Backend Tests
 ```bash
@@ -213,7 +203,7 @@ npm test
 
 ---
 
-## 🚢 Deployment
+Deployment
 
 ### Docker Deployment
 
@@ -232,7 +222,7 @@ See `docs/deployment.md` for detailed instructions.
 
 ---
 
-## 📈 Monitoring & Logging
+Monitoring & Logging
 
 - Request/response logging
 - Performance metrics tracking
@@ -241,7 +231,7 @@ See `docs/deployment.md` for detailed instructions.
 
 ---
 
-## 🤝 Contributing
+Contributing
 
 1. Fork the repository
 2. Create feature branch (`git checkout -b feature/AmazingFeature`)
@@ -249,22 +239,7 @@ See `docs/deployment.md` for detailed instructions.
 4. Push to branch (`git push origin feature/AmazingFeature`)
 5. Open Pull Request
 
----
-
-## 📄 License
-
-This project is licensed under the MIT License.
-
----
-
-## 👨‍💻 Author
-
-**Data Science Team**  
-Contact: fraud-detection@company.com
-
----
-
-## 🙏 Acknowledgments
+Acknowledgments
 
 - XGBoost for the powerful gradient boosting framework
 - FastAPI for the high-performance web framework
