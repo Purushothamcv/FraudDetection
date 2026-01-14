@@ -90,7 +90,33 @@ class BatchPredictionResponse(BaseModel):
 class ModelInfoResponse(BaseModel):
     """Response schema for model information."""
     
-    model_config = {"protected_namespaces": ()}  # Allow model_ prefix
+    model_config = {
+        "protected_namespaces": (),  # Allow model_ prefix
+        "json_schema_extra": {
+            "example": {
+                "model_version": "1.0",
+                "model_type": "XGBoost Classifier",
+                "training_date": "2026-01-13",
+                "performance_metrics": {
+                    "roc_auc": 0.9997,
+                    "recall": 0.9897,
+                    "precision": 0.4267,
+                    "f1_score": 0.5963
+                },
+                "features": [
+                    "step", "amount", "oldbalanceOrg", 
+                    "newbalanceOrig", "oldbalanceDest", 
+                    "newbalanceDest", "type_encoded"
+                ],
+                "hyperparameters": {
+                    "n_estimators": 100,
+                    "max_depth": 10,
+                    "learning_rate": 0.1
+                },
+                "training_data_size": 5090096
+            }
+        }
+    }
     
     model_version: str = Field(..., description="Model version")
     model_type: str = Field(..., description="Model algorithm type")
@@ -115,32 +141,6 @@ class ModelInfoResponse(BaseModel):
         ...,
         description="Number of training samples"
     )
-    
-    class Config:
-        json_schema_extra = {
-            "example": {
-                "model_version": "1.0",
-                "model_type": "XGBoost Classifier",
-                "training_date": "2026-01-13",
-                "performance_metrics": {
-                    "roc_auc": 0.9997,
-                    "recall": 0.9897,
-                    "precision": 0.4267,
-                    "f1_score": 0.5963
-                },
-                "features": [
-                    "step", "amount", "oldbalanceOrg", 
-                    "newbalanceOrig", "oldbalanceDest", 
-                    "newbalanceDest", "type_encoded"
-                ],
-                "hyperparameters": {
-                    "n_estimators": 100,
-                    "max_depth": 10,
-                    "learning_rate": 0.1
-                },
-                "training_data_size": 5090096
-            }
-        }
 
 
 class FeatureImportanceResponse(BaseModel):
