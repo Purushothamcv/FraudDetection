@@ -90,6 +90,8 @@ class BatchPredictionResponse(BaseModel):
 class ModelInfoResponse(BaseModel):
     """Response schema for model information."""
     
+    model_config = {"protected_namespaces": ()}  # Allow model_ prefix
+    
     model_version: str = Field(..., description="Model version")
     model_type: str = Field(..., description="Model algorithm type")
     training_date: str = Field(..., description="Training date")
@@ -187,6 +189,8 @@ class FeatureImportanceResponse(BaseModel):
 
 class HealthCheckResponse(BaseModel):
     """Response schema for health check."""
+    
+    model_config = {"protected_namespaces": ()}  # Allow model_ prefix
     
     status: str = Field(..., description="API health status")
     model_loaded: bool = Field(..., description="Whether model is loaded")
