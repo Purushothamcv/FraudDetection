@@ -7,6 +7,7 @@ from pydantic_settings import BaseSettings
 from typing import List
 from functools import lru_cache
 import os
+from pathlib import Path
 
 
 class Settings(BaseSettings):
@@ -35,11 +36,52 @@ class Settings(BaseSettings):
         "*"  # Allow all for production (can be restricted later)
     ]
     
-    # Model Paths
-    model_path: str = "models/fraud_detection_xgboost_v1.pkl"
-    encoder_path: str = "models/label_encoder.pkl"
-    metadata_path: str = "models/model_metadata.json"
-    feature_importance_path: str = "models/feature_importance.json"
+    @property
+    def models_dir(self) -> Path:
+        """
+        Get the absolute path to the models directory.
+        Works in local development, Docker, and Render.
+        Priority: MODEL_DIR env var > /app/models (Docker/Render) > relative path (local)
+        """
+        # Check if MODEL_DIR environment variable is set
+        model_dir_env = os.getenv("MODEL_DIR")
+        if model_dir_env:
+            return Path(model_dir_env)
+        
+        # Check if running in Docker/Render (/app/models)
+        docker_models_path = Path("/app/models")
+        if docker_models_path.exists():
+            return docker_models_path
+        
+        # Fall back to relative path from project root (local development)
+        # Get path relative to this config.py file: backend/app/core/config.py
+        # Navigate up to backend/ then to models/
+        backend_dir = Path(__file__).resolve().parent.parent.parent
+        return backend_dir / "models"
+    
+    @property
+    def model_path(self) -> str:
+        """Full path to the XGBoost model file."""
+        model_file = os.getenv("MODEL_FILE", "fraud_detection_xgboost_v1.pkl")
+        return str(self.models_dir / model_file)
+    
+    @property
+    def encoder_path(self) -> str:
+        """Full path to the label encoder file."""
+        encoder_file = os.getenv("ENCODER_FILE", "label_encoder.pkl")
+        return str(self.models_dir / encoder_file)
+    
+    @property
+    def metadata_path(self) -> str:
+        """Full path to the model metadata file."""
+        metadata_file = os.getenv("METADATA_FILE", "model_metadata.json")
+        return str(self.models_dir / metadata_file)
+    
+    @property
+    def feature_importance_path(self) -> str:
+        """Full path to the feature importance file."""
+        feature_importance_file = os.getenv("FEATURE_IMPORTANCE_FILE", "feature_importance.json")
+        return str(self.models_dir / feature_importance_file)
     
     # Risk Thresholds
     high_risk_threshold: float = 0.8

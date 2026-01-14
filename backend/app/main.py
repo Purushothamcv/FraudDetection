@@ -49,10 +49,16 @@ async def lifespan(app: FastAPI):
     logger.info("Starting Fraud Detection API...")
     logger.info(f"Environment: {settings.env}")
     logger.info(f"API Prefix: {settings.api_prefix}")
+    logger.info(f"Models Directory: {settings.models_dir}")
     
     try:
         # Load model and associated artifacts
         logger.info("Loading ML model and artifacts...")
+        logger.info(f"  Model Path: {settings.model_path}")
+        logger.info(f"  Encoder Path: {settings.encoder_path}")
+        logger.info(f"  Metadata Path: {settings.metadata_path}")
+        logger.info(f"  Feature Importance Path: {settings.feature_importance_path}")
+        
         model_loader.load_all(
             model_path=settings.model_path,
             encoder_path=settings.encoder_path,
@@ -63,6 +69,7 @@ async def lifespan(app: FastAPI):
         
     except Exception as e:
         logger.error(f"✗ Failed to load model artifacts: {str(e)}")
+        logger.exception("Full error traceback:")
         raise
     
     logger.info("✓ Fraud Detection API started successfully")
