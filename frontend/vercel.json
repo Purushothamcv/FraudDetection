@@ -3,6 +3,9 @@
   "outputDirectory": "dist",
   "installCommand": "npm install",
   "framework": "vite",
+  "env": {
+    "VITE_API_URL": "https://frauddetection-9w5g.onrender.com"
+  },
   "rewrites": [
     {
       "source": "/(.*)",
