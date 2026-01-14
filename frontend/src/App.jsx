@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Shield, BarChart3, Info, AlertTriangle } from 'lucide-react';
 import TransactionForm from './components/TransactionForm';
 import PredictionResult from './components/PredictionResult';
 import FeatureImportance from './components/FeatureImportance';
 import ModelInfo from './components/ModelInfo';
 import ShinyText from './components/ShinyText';
-import { predictTransaction } from './services/api';
+import { predictTransaction, wakeUpBackend } from './services/api';
 import './App.css';
 
 function App() {
@@ -14,6 +14,17 @@ function App() {
   const [transactionData, setTransactionData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [backendStatus, setBackendStatus] = useState('checking'); // checking, awake, sleeping
+
+  // Wake up backend on component mount
+  useEffect(() => {
+    const wakeBackend = async () => {
+      setBackendStatus('checking');
+      const isAwake = await wakeUpBackend();
+      setBackendStatus(isAwake ? 'awake' : 'sleeping');
+    };
+    wakeBackend();
+  }, []);
 
   const handlePrediction = async (transactionData) => {
     try {
@@ -23,6 +34,7 @@ function App() {
       const result = await predictTransaction(transactionData);
       setPrediction(result);
       setTransactionData(transactionData);
+      setBackendStatus('awake'); // Backend responded successfully
       
       // Scroll to result
       setTimeout(() => {
@@ -35,6 +47,9 @@ function App() {
     } catch (err) {
       setError(err.message || 'Failed to analyze transaction');
       console.error('Prediction error:', err);
+      if (err.message.includes('waking up')) {
+        setBackendStatus('sleeping');
+      }
     } finally {
       setIsLoading(false);
     }
@@ -72,8 +87,16 @@ function App() {
               </div>
             </div>
             <div className="flex items-center gap-2 bg-success-50 border border-success-200 px-3 sm:px-4 py-2 rounded-lg">
-              <div className="w-2 h-2 bg-success-500 rounded-full animate-pulse"></div>
-              <span className="text-xs sm:text-sm font-medium text-success-800">System Online</span>
+              <div className={`w-2 h-2 rounded-full ${
+                backendStatus === 'awake' ? 'bg-success-500 animate-pulse' :
+                backendStatus === 'sleeping' ? 'bg-warning-500' :
+                'bg-gray-400 animate-pulse'
+              }`}></div>
+              <span className="text-xs sm:text-sm font-medium text-gray-700">
+                {backendStatus === 'awake' ? 'System Active' :
+                 backendStatus === 'sleeping' ? 'Waking up server...' :
+                 'Checking status...'}
+              </span>
             </div>
           </div>
         </div>

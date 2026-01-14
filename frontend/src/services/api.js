@@ -11,7 +11,7 @@ const apiClient = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
-  timeout: 30000, // 30 seconds
+  timeout: 90000, // 90 seconds - Render free tier takes 50s to wake up
 });
 
 // Request interceptor
@@ -40,6 +40,20 @@ apiClient.interceptors.response.use(
 );
 
 /**
+ * Wake up the backend server (Render free tier sleeps after inactivity)
+ */
+export const wakeUpBackend = async () => {
+  try {
+    const healthUrl = `${API_BASE_URL}/health`;
+    await axios.get(healthUrl, { timeout: 90000 });
+    return true;
+  } catch (error) {
+    console.warn('Backend wake-up failed, but will retry with main request:', error.message);
+    return false;
+  }
+};
+
+/**
  * Predict fraud for a single transaction
  */
 export const predictTransaction = async (transactionData) => {
@@ -47,6 +61,9 @@ export const predictTransaction = async (transactionData) => {
     const response = await apiClient.post('/predictions/single', transactionData);
     return response.data;
   } catch (error) {
+    if (error.code === 'ECONNABORTED' || error.message.includes('timeout')) {
+      throw new Error('Backend is waking up (takes ~50 seconds on Render free tier). Please try again in a moment.');
+    }
     throw new Error(error.response?.data?.detail?.message || 'Failed to predict transaction');
   }
 };
