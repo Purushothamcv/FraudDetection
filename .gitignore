@@ -83,10 +83,10 @@ Fraud.csv
 .ipynb_checkpoints/
 *.ipynb_checkpoints
 
-# Model artifacts (large pickle files)
-*.pkl
-backend/models/*.pkl
-models/*.pkl
+# Model artifacts (large pickle files) - COMMENTED OUT FOR DEPLOYMENT
+# *.pkl
+# backend/models/*.pkl
+# models/*.pkl
 
 # Build artifacts
 frontend/dist/
